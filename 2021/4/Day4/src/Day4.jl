@@ -87,9 +87,9 @@ function findMeasureOfLastWinner(states::Array{BoardState}, (pick, remaining...)
 
   if length(winners) > 0
     return findMeasureOfLastWinner(losers, remaining, winners[1])
-  else
-    return findMeasureOfLastWinner(losers, remaining, lastWinner)
   end
+
+  return findMeasureOfLastWinner(losers, remaining, lastWinner)
 end
 
 function main()
