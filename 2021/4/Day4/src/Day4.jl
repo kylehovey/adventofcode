@@ -65,7 +65,7 @@ function nextBoard(state::BoardState, pick::Int)
   BoardState(state.board, nextPicked, pick)
 end
 
-function findMeasureOfWinner(states::Array{BoardState}, (pick, remaining...))
+function findMeasureOfFirstWinner(states::Array{BoardState}, (pick, remaining...))
   nextStates = map(state -> nextBoard(state, pick), states)
   winners = filter(state -> hasWon(state.picked), nextStates)
 
@@ -73,13 +73,29 @@ function findMeasureOfWinner(states::Array{BoardState}, (pick, remaining...))
     return measureOf(winners[1])
   end
 
-  return findMeasureOfWinner(nextStates, remaining)
+  return findMeasureOfFirstWinner(nextStates, remaining)
+end
+
+function findMeasureOfLastWinner(states::Array{BoardState}, (pick, remaining...), lastWinner = Nothing)
+  if length(states)  == 0
+    return measureOf(lastWinner)
+  end
+
+  nextStates = map(state -> nextBoard(state, pick), states)
+  winners = filter(state -> hasWon(state.picked), nextStates)
+  losers = filter(state -> !hasWon(state.picked), nextStates)
+
+  if length(winners) > 0
+    return findMeasureOfLastWinner(losers, remaining, winners[1])
+  else
+    return findMeasureOfLastWinner(losers, remaining, lastWinner)
+  end
 end
 
 function main()
   states, picks = parseInput()
 
-  return findMeasureOfWinner(states, picks)
+  return findMeasureOfFirstWinner(states, picks), findMeasureOfLastWinner(states, picks)
 end
 
 end # module
