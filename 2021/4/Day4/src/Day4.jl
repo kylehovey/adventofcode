@@ -25,7 +25,7 @@ colSieves = transpose.(rowSieves)
 sieves = [digSieves; rowSieves; colSieves]
 
 function parseInput()
-  input = readlines("../input.txt")
+  input = readlines("./input.txt")
   picks = map(x -> parse(Int, x), split(input[1], ','))
   boards = input[2:end] |>
     data -> filter(row -> length(row) > 0, data)  |>
@@ -47,9 +47,9 @@ function parseInput()
   boards, picks
 end
 
-function hasWon(picked::Matrix{Int})
+function hasWon(state::BoardState)
   linesWon = sieves |>
-    data -> map(sieve -> sieve .* picked, data) |>
+    data -> map(sieve -> sieve .* state.picked, data) |>
     data -> filter(ofLine -> sum(ofLine) == 5, data)
 
   length(linesWon) > 0
@@ -67,7 +67,7 @@ end
 
 function findMeasureOfFirstWinner(states::Array{BoardState}, (pick, remaining...))
   nextStates = map(state -> nextBoard(state, pick), states)
-  winners = filter(state -> hasWon(state.picked), nextStates)
+  winners = filter(hasWon, nextStates)
 
   if length(winners) > 0
     return measureOf(winners[1])
@@ -82,8 +82,8 @@ function findMeasureOfLastWinner(states::Array{BoardState}, (pick, remaining...)
   end
 
   nextStates = map(state -> nextBoard(state, pick), states)
-  winners = filter(state -> hasWon(state.picked), nextStates)
-  losers = filter(state -> !hasWon(state.picked), nextStates)
+  winners = filter(hasWon, nextStates)
+  losers = filter(!hasWon, nextStates)
 
   if length(winners) > 0
     return findMeasureOfLastWinner(losers, remaining, winners[1])
