@@ -6,7 +6,7 @@ function parseInput()
   readlines("./input.txt") .|>
     line -> split(line, " -> ") .|>
     lst -> lst .|>
-    s -> Tuple(split(s, ",") .|> x -> parse(Int, x))
+    s -> Tuple(split(s, ",") .|> x -> parse(Int, x) + 1)
 end
 
 function ventMap(((from, to), lines...), grid)
@@ -18,6 +18,10 @@ function ventMap(((from, to), lines...), grid)
   else
     coords = zip([0:dX; 0:-1:dX], [0:dY; 0:-1:dY]) .|> dV -> from .+ dV
     grid[coords .|> CartesianIndex] .+= 1
+  end
+
+  if isempty(lines)
+    return
   end
 
   ventMap(lines, grid)
