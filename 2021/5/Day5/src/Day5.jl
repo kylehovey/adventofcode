@@ -20,7 +20,7 @@ function ventMap(((from, to), lines...), grid)
     grid[coords .|> CartesianIndex] .+= 1
   end
 
-  if length(lines) == 0
+  if isempty(lines)
     return grid
   end
 
