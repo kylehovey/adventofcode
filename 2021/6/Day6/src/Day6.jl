@@ -1,10 +1,14 @@
 module Day6
 
 using Revise
+using Memoize
 
-function parseInput()
-  feesh = split(readline("./input.txt"), ",") .|> x -> parse(Int, x)
-  0:8 .|> x -> count(f -> f == x, feesh)
+@memoize function feesh()
+  split(readline("./input.txt"), ",") .|> x -> parse(Int, x)
+end
+
+@memoize function fishCount()
+  0:8 .|> x -> count(f -> f == x, feesh())
 end
 
 function nextAquarium(aquarium)
@@ -21,9 +25,21 @@ function aquariumAfter(days, aquarium)
   return aquariumAfter(days - 1, nextAquarium(aquarium))
 end
 
+@memoize function fish(counter, daysLeft)
+  if daysLeft == 0
+    return 1
+  elseif counter == 0
+    return fish(8, daysLeft - 1) + fish(6, daysLeft - 1)
+  else
+    return fish(counter - 1, daysLeft - 1)
+  end
+end
+
 function main()
-  println(aquariumAfter(80, parseInput()) |> sum)
-  println(aquariumAfter(256, parseInput()) |> sum)
+  println(aquariumAfter(80, fishCount()) |> sum)
+  println(sum(feesh() .|> counter -> fish(counter, 80)))
+  println(aquariumAfter(256, fishCount()) |> sum)
+  println(sum(feesh() .|> counter -> fish(counter, 256)))
 end
 
 end # module
