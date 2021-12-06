@@ -3,15 +3,14 @@ module Day6
 using Revise
 
 function parseInput()
-  split(readline("./input.txt"), ",") .|> x -> parse(Int, x)
-end
-
-function nextFish(fish)
-  fish == 0 ? [6, 8] : [fish - 1]
+  feesh = split(readline("./input.txt"), ",") .|> x -> parse(Int, x)
+  0:8 .|> x -> count(f -> f == x, feesh)
 end
 
 function nextAquarium(aquarium)
-  Iterators.flatten(map(nextFish, aquarium)) |> collect
+  nextOne = circshift(aquarium, -1)
+  nextOne[7] += aquarium[1]
+  nextOne
 end
 
 function aquariumAfter(days, aquarium)
@@ -23,7 +22,8 @@ function aquariumAfter(days, aquarium)
 end
 
 function main()
-  println(aquariumAfter(80, parseInput()) |> length)
+  println(aquariumAfter(80, parseInput()) |> sum)
+  println(aquariumAfter(256, parseInput()) |> sum)
 end
 
 end # module
