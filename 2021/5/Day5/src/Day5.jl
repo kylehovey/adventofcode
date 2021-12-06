@@ -20,17 +20,13 @@ function ventMap(((from, to), lines...), grid)
     grid[coords .|> CartesianIndex] .+= 1
   end
 
-  if isempty(lines)
-    return grid
-  end
-
-  return ventMap(lines, grid)
+  ventMap(lines, grid)
 end
 
 function main()
   grid = zeros(Int, (1000, 1000))
-  vents = ventMap(parseInput(), grid)
-  length(vents[vents .> 1])
+  ventMap(parseInput(), grid)
+  length(grid[grid .> 1])
 end
 
 end # module
