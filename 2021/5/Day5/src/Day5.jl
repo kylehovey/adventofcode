@@ -2,36 +2,27 @@ module Day5
 
 using Revise
 
-struct Line
-  from::Tuple{Int, Int}
-  to::Tuple{Int, Int}
-end
-
-function lineFromCoords((first, last))
-  Line(Tuple(x + 1 for x in first), Tuple(x + 1 for x in last))
-end
-
 function parseInput()
   readlines("./input.txt") .|>
     line -> split(line, " -> ") .|>
     lst -> lst .|>
-    s -> (split(s, ",") .|> x -> parse(Int, x)) .|>
-    lineFromCoords
+    s -> Tuple(split(s, ",") .|> x -> parse(Int, x))
 end
 
-function ventMap((line, lines...)::Array{Line}, grid)
-  x, y = line.from
-  X, Y = line.to
+function ventMap(((from, to), lines...), grid)
+  (x, y), (X, Y) = from, to
+  dX, dY = to .- from
 
-  if x == X || y == Y
+  if dX == 0 || dY == 0
     grid[min(x, X):max(x, X), min(y, Y):max(y, Y)] .+= 1
   else
-    dX, dY = line.to .- line.from
-    coords = zip([0:dX; 0:-1:dX], [0:dY; 0:-1:dY]) .|> dV -> line.from .+ dV
+    coords = zip([0:dX; 0:-1:dX], [0:dY; 0:-1:dY]) .|> dV -> from .+ dV
     grid[coords .|> CartesianIndex] .+= 1
   end
 
-  if length(lines) == 0 return grid
+  if length(lines) == 0
+    return grid
+  end
 
   return ventMap(lines, grid)
 end
