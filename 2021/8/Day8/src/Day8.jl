@@ -26,7 +26,7 @@ function digitize(serialization)
 end
 
 function parseInput()
-  split.(readlines("./input.txt"), " | ") .|>
+  split.(readlines("./test.txt"), " | ") .|>
     x -> split.(x, " ") .|>
     digits -> digitize.(digits)
 end
@@ -42,6 +42,13 @@ function sortedByColumnLength(D)
 end
 
 sortedNormalDigits = sortedByColumnLength(normalDigits)
+Pi = pinv(sortedNormalDigits)
+
+function defuck(A, epsilon = 0.2)
+  A[A.<=(epsilon)] .= 0
+  A[A.>(epsilon)] .= 1
+  A
+end
 
 function parseLine((input, output))
   D = hcat(input...)
@@ -50,16 +57,15 @@ function parseLine((input, output))
 
   for (i, j) ∈ IterTools.product(1:3, 1:3)
     Dsp = Ds * rotOne^i * rotTwo^j
-    Pi = pinv(sortedNormalDigits)
 
-    if (Dsp * Pi) * sortedNormalDigits ≈ Dsp
+    if defuck((Dsp * Pi) * sortedNormalDigits) ≈ Dsp
       unscrambled = Int.(round.(inv(Dsp * Pi) * O))
       digitCols = eachcol(normalDigits) |> collect
 
       outputDigits = eachcol(unscrambled) .|>
-        col -> findall(==(col), digitCols)[1]
+        col -> first(findall(==(col), digitCols))
 
-      return (0:3 .|> k -> outputDigits[4-k] * 10^k) |> sum
+      return (0:3 .|> k -> (outputDigits[4-k] - 1) * 10^k) |> sum
     end
   end
 end
