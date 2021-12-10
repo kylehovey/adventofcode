@@ -44,12 +44,6 @@ end
 sortedNormalDigits = sortedByColumnLength(normalDigits)
 Pi = pinv(sortedNormalDigits)
 
-function defuck(A, epsilon = 0.2)
-  A[A.<=(epsilon)] .= 0
-  A[A.>(epsilon)] .= 1
-  A
-end
-
 function parseLine((input, output))
   D = hcat(input...)
   O = hcat(output...)
@@ -58,7 +52,7 @@ function parseLine((input, output))
   for (i, j) ∈ IterTools.product(1:3, 1:3)
     Dsp = Ds * rotOne^i * rotTwo^j
 
-    if defuck((Dsp * Pi) * sortedNormalDigits) ≈ Dsp
+    if (Dsp * Pi) * sortedNormalDigits ≈ Dsp
       unscrambled = Int.(round.(inv(Dsp * Pi) * O))
       digitCols = eachcol(normalDigits) |> collect
 
